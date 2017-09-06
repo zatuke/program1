@@ -4,6 +4,6 @@
 		<delete file = "WebServer.class"/>
 	</target>
 	<target name = "complie" depends  = "clean">
-		<javac srcdir = "." destdir = "." includeantruntime="false"/>
+		<javac srcdir = "." destdir = "." includeantruntime="false" fork="true"/>
 	</target>
 </project>
