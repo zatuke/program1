@@ -1,0 +1,9 @@
+<project default = "complie">
+	<target name = "clean">
+		<delete file = "WebWorker.class"/>
+		<delete file = "WebServer.class"/>
+	</target>
+	<target name = "complie" depends  = "clean">
+		<javac srcdir = "." destdir = "." includeantruntime="false"/>
+	</target>
+</project>
