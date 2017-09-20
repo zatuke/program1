@@ -33,6 +33,10 @@ public class WebWorker implements Runnable
 {
 
 int cate = 0;
+String mt;
+long filesize; 
+byte[] buffer;
+InputStream file;
 private Socket socket;
 
 /**
@@ -61,8 +65,11 @@ public void run()
       temp = readHTTPRequest(is);
      
     
-      writeHTTPHeader(os,"text/html");
-      writeContentFile(os,temp);
+      writeHTTPHeader(os,mt);
+       if(mt == "image/jpeg" || mt == "image/gif" ||  mt == "image/png" || mt == "image/ico")
+         writeImage(os);
+       else
+         writeContentFile(os,temp);
     
       os.flush();
       socket.close();
@@ -90,12 +97,27 @@ private String readHTTPRequest(InputStream is)
       try {
          while (!r.ready()) Thread.sleep(1);
          line = r.readLine();
+         
             splitstuff = line.split(" "); //split first line
             realline = splitstuff[1]; //grab file path
+            if(realline.substring(1).endsWith(".html")){mt = "text/html";} //base case
+            else if(realline.substring(1).endsWith(".gif"))
+	                  mt = "image/gif";
+	         else if(realline.substring(1).endsWith(".jpg"))
+	                  mt = "image/jpeg";
+	         else if(realline.substring(1).endsWith(".png"))
+	                  mt = "image/png";
+            else if(realline.substring(1).endsWith(".ico"))
+                     mt = "image/ico"; 
+            
+            
+            
            File a = new File(realline.substring(1));
-                                          
+                                       
             BufferedReader mk = new BufferedReader(new FileReader(a)); //add path to new reader
             
+            
+          if(mt == "text/html"){
             while(mk.ready()){
               String b = mk.readLine();
             if(b.contains("<cs371date>")){
@@ -113,6 +135,12 @@ private String readHTTPRequest(InputStream is)
                spit = spit + b + "\n";
 
             }
+            }//end if text
+            else{
+            file = new FileInputStream(realline.substring(1));
+             filesize = new File(realline.substring(1)).length();
+             buffer = new byte[(int)filesize];   
+             }//end all other cases    
             
             
          
@@ -185,5 +213,13 @@ private void writeContentFile(OutputStream os , String s) throws Exception
    //os.write("yay\n".getBytes());
    }
 }
+
+private void writeImage(OutputStream os) throws Exception{
+
+   int a;
+      
+	            while((a=file.read(buffer))>0)
+               os.write(buffer,0,a);
+  }
 
 } // end class
